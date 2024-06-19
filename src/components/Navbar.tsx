@@ -2,6 +2,11 @@
 
 import React from 'react'
 import MaxWidthWrapper from './MaxWidthWrapper'
+import Link from 'next/link'
+import SvgComponent from './Icons'
+import NavItems from './NavItems'
+
+
 
 const Navbar = () => {
   return (
@@ -13,7 +18,13 @@ const Navbar = () => {
                         {/*TODO: Mobile navbar*/}
                     
                     <div className='ml-4 flex lg:ml:0'>
+                        <Link href="/">
+                           <SvgComponent className="mt-7"/>
+                        </Link>
+                    </div>
 
+                    <div className='hidden z-50 lg:ml-8 lg:block lg:self-strech'>
+                        <NavItems/>
                     </div>
                 </div>
                 </div>

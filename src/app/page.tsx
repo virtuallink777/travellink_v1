@@ -14,10 +14,10 @@ export default function Home() {
           <span className="text-blue-600">en todo el mundo</span>
         </h1>
         <div className="flex flex-col sm:flex-row gap-4 mt-6">
-          <Link href='/tiquetes' className={cn(buttonVariants(), 'hover:bg-blue-950 hover:text-yellow-500')}>
+          <Link href='/tiquetes' className={cn(buttonVariants(), 'hover:bg-blue-700 hover:text-yellow-300')}>
             Buscar tiquetes
           </Link>
-          <Link href='/hoteles' className={cn(buttonVariants(), 'hover:bg-blue-950 hover:text-yellow-500')}>
+          <Link href='/hoteles' className={cn(buttonVariants(), 'hover:bg-blue-700 hover:text-yellow-300')}>
             Buscar Hoteles
           </Link>
         </div>
