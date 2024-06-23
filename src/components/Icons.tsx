@@ -1,10 +1,11 @@
-import * as React from "react"
+import * as React from "react";
 const SvgComponent = (props) => (
   <svg
     xmlns="http://www.w3.org/2000/svg"
     width={200}
-    height={100}
+    height={200}
     viewBox="0 0 264.583 158.75"
+    preserveAspectRatio="xMidYMid meet"
     {...props}
   >
     <path
@@ -52,9 +53,7 @@ const SvgComponent = (props) => (
       }}
     >
       <tspan x={74.521} y={54.263}>
-        <tspan dx="0 5.4198241 7.5654302 7.528223 7.4041977 7.5654297">
-         
-        </tspan>
+        <tspan dx="0 5.4198241 7.5654302 7.528223 7.4041977 7.5654297"></tspan>
       </tspan>
     </text>
     <text
@@ -100,5 +99,5 @@ const SvgComponent = (props) => (
       </tspan>
     </text>
   </svg>
-)
-export default SvgComponent
+);
+export default SvgComponent;
