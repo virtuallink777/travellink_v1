@@ -3,32 +3,37 @@ import { mongooseAdapter } from "@payloadcms/db-mongodb";
 import { slateEditor } from "@payloadcms/richtext-slate";
 import path from "path";
 import { buildConfig } from "payload/config";
+import { Users } from "./app/collections/Users";
+import dotenv from "dotenv";
 
-
+dotenv.config({
+  path: path.resolve(__dirname, "../.env"),
+});
 
 export default buildConfig({
   serverURL: process.env.NEXT_PUBLIC_SERVER_URL || "",
-  collections: [],
+  collections: [Users],
   routes: {
-    admin: '/admin'
+    admin: "/admin",
   },
   admin: {
+    user: "users",
     bundler: webpackBundler(),
     meta: {
-      titleSuffix: 'Travellink',
-      favicon: '/favicon.ico',
-      ogImage: '/thumbnail.jpg'
-    }
+      titleSuffix: "Travellink",
+      favicon: "/favicon.ico",
+      ogImage: "/thumbnail.jpg",
+    },
   },
   rateLimit: {
-    max: 500
+    max: 500,
   },
 
   editor: slateEditor({}),
   db: mongooseAdapter({
-    url: process.env.MONGODB_URL!
+    url: process.env.MONGODB_URL!,
   }),
   typescript: {
-    outputFile: path.resolve(__filename, 'payload-types.ts'),
-  }
-})
+    outputFile: path.resolve(__filename, "payload-types.ts"),
+  },
+});

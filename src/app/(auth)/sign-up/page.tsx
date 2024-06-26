@@ -8,24 +8,13 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
+import {
+  TAuthCredentialsValidator,
+  AuthCredentialsValidator,
+} from "@/lib/validators/account-credentials-validator";
+import { trpc } from "@/trpc/client";
 
 const Page = () => {
-  const AuthCredentialsValidator = z
-    .object({
-      email: z.string().email({ message: "Email invalido" }),
-      password: z
-        .string()
-        .min(8, { message: "El password debe tener minimo 8 caracteres" }),
-      confirmPassword: z.string(),
-    })
-    .refine((data) => data.password === data.confirmPassword, {
-      message: "Las contraseñas no coinciden",
-      path: ["confirmPassword"],
-    });
-
-  type TAuthCredentialsValidator = z.infer<typeof AuthCredentialsValidator>;
-
   const {
     register,
     handleSubmit,
@@ -33,6 +22,10 @@ const Page = () => {
   } = useForm<TAuthCredentialsValidator>({
     resolver: zodResolver(AuthCredentialsValidator),
   });
+
+  const { data } = trpc.anyApiRoute.useQuery();
+
+  console.log(data);
 
   const onSubmit = ({ email, password }: TAuthCredentialsValidator) => {
     // send data to the server
