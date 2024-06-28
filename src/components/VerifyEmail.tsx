@@ -1,7 +1,7 @@
 "use client";
 
 import { trpc } from "@/trpc/client";
-import { XCircle } from "lucide-react";
+import { Loader2, XCircle } from "lucide-react";
 import React from "react";
 import Link from "next/link";
 import { buttonVariants } from "./ui/button";
@@ -16,7 +16,7 @@ const VerifyEmail = ({ token }: VerifyEmailProps) => {
     token,
   });
 
-  if (false) {
+  if (isError) {
     return (
       <div className="flex flex-col items-center gap-2">
         <XCircle className="h-8 w-8 text-red-500" />
@@ -28,7 +28,7 @@ const VerifyEmail = ({ token }: VerifyEmailProps) => {
     );
   }
 
-  if (true) {
+  if (data?.success) {
     return (
       <div className="flex h-full flex-col items-center justify-center">
         <h3 className="font-semibold text-2xl">Cuenta Verificada</h3>
@@ -48,7 +48,17 @@ const VerifyEmail = ({ token }: VerifyEmailProps) => {
     );
   }
 
-  return <div></div>;
+  if(isLoading){
+    return (
+      <div className="flex flex-col items-center gap-2">
+        <Loader2 className="animate-spin  h-8 w-8 text-zinc-400" />
+        <h3 className="font-semibold text-xl">Estamos verificando</h3>
+        <p className="text-muted-foreground text-sm ">
+          Esto tardara unos segundos...
+        </p>
+      </div>
+    );
+  }
 };
 
 export default VerifyEmail;

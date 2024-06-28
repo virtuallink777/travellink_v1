@@ -2,7 +2,6 @@ import { AuthCredentialsValidator } from "../lib/validators/account-credentials-
 import { publicProcedure, router } from "./trpc";
 import { getPayLoadClient } from "../get-payload";
 import { TRPCError } from "@trpc/server";
-import VerifyEmail from "@/components/VerifyEmail";
 import { z } from "zod";
 
 export const authRouter = router({
