@@ -15,9 +15,13 @@ import {
 import { trpc } from "@/trpc/client";
 import { toast } from "sonner";
 import { ZodError } from "zod";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 const Page = () => {
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const origin = searchParams.get("origin");
+
   const {
     register,
     handleSubmit,
@@ -26,33 +30,31 @@ const Page = () => {
     resolver: zodResolver(AuthCredentialsValidator),
   });
 
-  const router = useRouter();
+  const { mutate: signIn, isLoading } = trpc.auth.signIn.useMutation({
+    onSuccess: ({}) => {
+      toast.success("Logueado exitosamente");
 
-  const { mutate, isLoading } = trpc.auth.createPayloadUser.useMutation({
-    onError: (err) => {
-      if (err.data?.code === "BAD_REQUEST") {
-        toast.error("Este Email ya esta en Uso, por favor logueate");
+      router.refresh();
 
+      if (origin) {
+        router.push(`/${origin}`);
         return;
       }
 
-      if (err instanceof ZodError) {
-        toast.error(err.issues[0].message);
-
-        return;
-      }
-
-      toast.error("Algo esta ocurriendo. Por favor intenta nuevamente");
+      router.push("/");
     },
 
-    onSuccess: ({ sentToEmail }) => {
-      toast.success(`La Verificación del Email se envió a: ${sentToEmail}`);
-      router.push("/verify-email?to=" + sentToEmail);
+    onError: (err) => {
+      console.log("error", err);
+      if (err.data?.code === "UNAUTHORIZED") {
+        toast.error("Email o Contraseña Invalidos");
+        return;
+      }
     },
   });
 
   const onSubmit = ({ email, password }: TAuthCredentialsValidator) => {
-    mutate({
+    signIn({
       email,
       password,
       confirmPassword: password,
@@ -67,7 +69,7 @@ const Page = () => {
             <div className="flex justify-center w-full">
               <SvgComponent />
             </div>
-            <h1 className="text-2xl font-bold">Crea una Cuenta</h1>
+            <h1 className="text-2xl font-bold">Logueate</h1>
           </div>
 
           <div className="grid gap-6">
@@ -109,30 +111,31 @@ const Page = () => {
                   )}
                 </div>
 
-                <div className="grid gap-1 py-2">
-                  <Label htmlFor="confirmPassword">Confirma tu password</Label>
-                  <Input
-                    {...register("confirmPassword")}
-                    id="confirmPassword"
-                    type="password"
-                    className={cn({ "focus-visible:ring-red-500": true })}
-                    placeholder="password de min. 8 caracteres"
-                  />
-                  {errors.confirmPassword && (
-                    <p className="text-red-500">
-                      {errors.confirmPassword.message}
-                    </p>
-                  )}
-                </div>
-
                 <Button
                   className={cn(
                     buttonVariants(),
                     "hover:bg-blue-700 hover:text-yellow-300"
                   )}
                 >
-                  Crea la Cuenta
+                  Logueate
                 </Button>
+                <br />
+                <br />
+                <br />
+
+                <h3 className="font-semibold text-xl text-center">
+                  No tienes una cuenta?, entonces Registrate:
+                </h3>
+
+                <Link
+                  href="/sign-up"
+                  className={cn(
+                    buttonVariants(),
+                    "hover:bg-blue-700 hover:text-yellow-300"
+                  )}
+                >
+                  Crea tu cuenta
+                </Link>
               </div>
             </form>
           </div>

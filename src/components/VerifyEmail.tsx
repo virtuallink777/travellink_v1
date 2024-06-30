@@ -2,10 +2,11 @@
 
 import { trpc } from "@/trpc/client";
 import { Loader2, XCircle } from "lucide-react";
-import React from "react";
+import React, { useEffect } from "react";
 import Link from "next/link";
 import { buttonVariants } from "./ui/button";
 import { cn } from "@/lib/utils";
+import { useRouter } from "next/navigation";
 
 interface VerifyEmailProps {
   token: string;
@@ -15,6 +16,16 @@ const VerifyEmail = ({ token }: VerifyEmailProps) => {
   const { data, isLoading, isError } = trpc.auth.VerifyEmail.useQuery({
     token,
   });
+
+  const router = useRouter();
+
+  useEffect(() => {
+    if (data?.success) {
+      setTimeout(() => {
+        router.push("/sign-in");
+      }, 5000);
+    }
+  }, [data, router]);
 
   if (isError) {
     return (
@@ -33,22 +44,16 @@ const VerifyEmail = ({ token }: VerifyEmailProps) => {
       <div className="flex h-full flex-col items-center justify-center">
         <h3 className="font-semibold text-2xl">Cuenta Verificada</h3>
         <p className="text-muted-foreground text-center mt-1 pb-3">
-          Gracias por verificar tu Email
+          Gracias por verificar tu Email,{" "}
+          <span className="font-bold">
+            te vamos a redireccionar para que te Loguees
+          </span>
         </p>
-        <Link
-          className={cn(
-            buttonVariants(),
-            "hover:bg-blue-700 hover:text-yellow-300"
-          )}
-          href="/sign-in"
-        >
-          Logueate
-        </Link>
       </div>
     );
   }
 
-  if(isLoading){
+  if (isLoading) {
     return (
       <div className="flex flex-col items-center gap-2">
         <Loader2 className="animate-spin  h-8 w-8 text-zinc-400" />

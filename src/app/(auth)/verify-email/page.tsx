@@ -1,6 +1,9 @@
-import SvgComponent from "@/components/Icons";
+"use client";
 
+import SvgComponent from "@/components/Icons";
 import VerifyEmail from "@/components/VerifyEmail";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 interface PageProps {
   searchParams: { [key: string]: string | string[] | undefined };
@@ -9,6 +12,14 @@ interface PageProps {
 const VerifyEmailPage = ({ searchParams }: PageProps) => {
   const token = searchParams.token;
   const toEmail = searchParams.to;
+
+  const router = useRouter();
+
+  useEffect(() => {
+    setTimeout(() => {
+      router.push("/");
+    }, 5000);
+  }, [router]);
 
   return (
     <div className="container relative flex pt-20 flex-col items-center justify-center lg:px-0">
