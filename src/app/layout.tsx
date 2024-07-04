@@ -1,5 +1,3 @@
-
-
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
@@ -8,9 +6,6 @@ import Navbar from "@/components/Navbar";
 import Providers from "@/components/Providers";
 import { Toaster } from "sonner";
 import { AutoLogoutWrapper } from "@/components/AutoLogoutWrapper";
-
-
-
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -24,25 +19,25 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
-
-
   return (
-    <html lang="en" className="h-full ">
-      <body
-        className={cn("relative h-full font-sans antialiased", inter.className)}
-      >
-      <AutoLogoutWrapper>
-        <main className="relative flex flex-col min-h-screen">
-          <Providers>
-            <Navbar />
-            <div className="flex-grow flex-1">{children}</div>
-          </Providers>
-        </main>
+    <AutoLogoutWrapper>
+      <html lang="en" className="h-full ">
+        <body
+          className={cn(
+            "relative h-full font-sans antialiased",
+            inter.className
+          )}
+        >
+          <main className="relative flex flex-col min-h-screen">
+            <Providers>
+              <Navbar />
+              <div className="flex-grow flex-1">{children}</div>
+            </Providers>
+          </main>
 
-        <Toaster position="top-center" richColors />
-      </AutoLogoutWrapper>
-      </body>
-    </html>
+          <Toaster position="top-center" richColors />
+        </body>
+      </html>
+    </AutoLogoutWrapper>
   );
 }
