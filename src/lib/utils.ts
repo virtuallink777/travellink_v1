@@ -5,7 +5,7 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-const cityColMap: { [key: string]: string } = {
+export const cityColMap: { [key: string]: string } = {
   ARMENIA: "AXM",
   BUCARAMANGA: "BGA",
   BOGOTA: "BOG",
@@ -29,13 +29,13 @@ const cityColMap: { [key: string]: string } = {
   MONTERIA: "MTR",
   MITU: "MVP",
   NEIVA: "NVA",
-  "PUERTO-CARRENO": "PCR",
+  PUERTOCARRENO: "PCR",
   PEREIRA: "PEI",
   PITALITO: "PTX",
   POPAYAN: "PPN",
   PASTO: "PSO",
   SANTANDER: "SNT",
-  "SAN-ANDRES": "ADZ",
+  SANANDRES: "ADZ",
   VILLAVICENCIO: "VVC",
 };
 

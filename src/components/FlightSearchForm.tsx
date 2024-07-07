@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Button } from "./ui/button";
 import { cn } from "@/lib/utils";
 import { buttonVariants } from "./ui/button";
 import FlightOffer from "./FlightOffer";
 import { convertToIATACode } from "@/lib/utils";
+import { cityColMap } from "@/lib/utils";
 
 export default function FlightSearchForm() {
   const [flights, setFlights] = useState([]);
@@ -12,7 +13,70 @@ export default function FlightSearchForm() {
   const [destination, setDestination] = useState("");
   const [departureDate, setDepartureDate] = useState("");
   const [adults, setAdults] = useState(1);
+  const [kids, setKids] = useState(0);
+  const [originSuggestions, setOriginSuggestions] = useState<string[]>([]);
+  const [destinationSuggestions, setDestinationSuggestions] = useState<
+    string[]
+  >([]);
   const [isLoading, setIsLoading] = useState(false);
+  const originRef = useRef<HTMLDivElement>(null);
+  const destinationRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (origin) {
+      const filteredCities = Object.keys(cityColMap)
+        .filter((city) => city.toLowerCase().includes(origin.toLowerCase()))
+        .slice(0, 5);
+      setOriginSuggestions(filteredCities);
+    } else {
+      setOriginSuggestions([]);
+    }
+  }, [origin]);
+
+  useEffect(() => {
+    if (destination) {
+      const filteredCities = Object.keys(cityColMap)
+        .filter((city) =>
+          city.toLowerCase().includes(destination.toLowerCase())
+        )
+        .slice(0, 5);
+      setDestinationSuggestions(filteredCities);
+    } else {
+      setDestinationSuggestions([]);
+    }
+  }, [destination]);
+
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        originRef.current &&
+        !originRef.current.contains(event.target as Node)
+      ) {
+        setOriginSuggestions([]);
+      }
+      if (
+        destinationRef.current &&
+        !destinationRef.current.contains(event.target as Node)
+      ) {
+        setDestinationSuggestions([]);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
+
+  const selectCity = (city: string, type: "origin" | "destination") => {
+    if (type === "origin") {
+      setOrigin(city);
+      setOriginSuggestions([]);
+    } else {
+      setDestination(city);
+      setDestinationSuggestions([]);
+    }
+  };
 
   const searchFlights = async () => {
     try {
@@ -24,6 +88,10 @@ export default function FlightSearchForm() {
         throw new Error("Por favor, complete todos los campos");
       }
 
+      if (origin === destination) {
+        throw new Error("El origen y el destino no pueden ser iguales");
+      }
+
       const originCode = convertToIATACode(origin);
       const destinationCode = convertToIATACode(destination);
 
@@ -32,6 +100,7 @@ export default function FlightSearchForm() {
         destinationLocationCode: destinationCode,
         departureDate: departureDate,
         adults: adults.toString(),
+        kids: kids.toString(),
       });
 
       const response = await fetch("/api/searchFlights", {
@@ -62,22 +131,50 @@ export default function FlightSearchForm() {
 
   return (
     <div className="flex flex-col mt-4">
-      <div className="mb-4">
+      <div className="mb-4 relative" ref={originRef}>
         <input
           type="text"
           placeholder="Ciudad de Origen"
           value={origin}
           onChange={(e) => setOrigin(e.target.value)}
+          className="w-full p-2 border rounded"
         />
+        {originSuggestions.length > 0 && (
+          <ul className="absolute z-10 w-full bg-white border border-gray-300 mt-1 rounded shadow-lg">
+            {originSuggestions.map((city) => (
+              <li
+                key={city}
+                className="p-2 cursor-pointer hover:bg-gray-100"
+                onClick={() => selectCity(city, "origin")}
+              >
+                {city}
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
 
-      <div className="mb-4">
+      <div className="mb-4 relative" ref={destinationRef}>
         <input
           type="text"
           placeholder="Ciudad de Destino"
           value={destination}
           onChange={(e) => setDestination(e.target.value)}
+          className="w-full p-2 border rounded"
         />
+        {destinationSuggestions.length > 0 && (
+          <ul className="absolute z-10 w-full bg-white border border-gray-300 mt-1 rounded shadow-lg">
+            {destinationSuggestions.map((city) => (
+              <li
+                key={city}
+                className="p-2 cursor-pointer hover:bg-gray-100"
+                onClick={() => selectCity(city, "destination")}
+              >
+                {city}
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
 
       <div className="mb-4 mr-4">
@@ -88,6 +185,18 @@ export default function FlightSearchForm() {
           value={adults}
           onChange={(e) => setAdults(Number(e.target.value))}
           min={1}
+          className="w-full p-2 border rounded"
+        />
+      </div>
+      <div className="mb-4 mr-4">
+        <div className="mr-4">Cantidad de Niños:</div>
+        <input
+          type="number"
+          placeholder="Niños"
+          value={kids}
+          onChange={(e) => setKids(Number(e.target.value))}
+          min={0}
+          className="w-full p-2 border rounded"
         />
       </div>
 
@@ -96,6 +205,7 @@ export default function FlightSearchForm() {
           type="date"
           value={departureDate}
           onChange={(e) => setDepartureDate(e.target.value)}
+          className="w-full p-2 border rounded"
         />
       </div>
 
