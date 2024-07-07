@@ -11,12 +11,16 @@ export default async function handler(
   res: NextApiResponse
 ) {
   if (req.method === "POST") {
-
     console.log("Recibida solicitud POST en /api/searchFlights");
     console.log("Cuerpo de la solicitud:", req.body);
 
     try {
-      const { originLocationCode, destinationLocationCode, departureDate, adults } = req.body;
+      const {
+        originLocationCode,
+        destinationLocationCode,
+        departureDate,
+        adults,
+      } = req.body;
 
       console.log("Realizando solicitud a Amadeus API...");
 
@@ -25,7 +29,7 @@ export default async function handler(
         destinationLocationCode,
         departureDate,
         adults: adults.toString(),
-        max: '10' // Limita a 10 resultados, puedes ajustar este número
+        max: "10", // Se pueden agregar mas solicitudes
       });
 
       console.log("Respuesta recibida de Amadeus API");
@@ -33,9 +37,9 @@ export default async function handler(
       res.status(200).json(response.data);
     } catch (error: any) {
       console.error("Error al buscar vuelos:", error);
-      res.status(400).json({ 
+      res.status(400).json({
         error: error.description?.[0]?.detail || "Error al buscar vuelos",
-        code: error.description?.[0]?.code
+        code: error.description?.[0]?.code,
       });
     }
   } else {

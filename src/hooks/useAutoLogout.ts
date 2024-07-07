@@ -4,7 +4,7 @@ import React, { useEffect } from "react";
 import { useAuth } from "./use-auth";
 import { useRouter } from "next/navigation";
 
-const INACTIVITY_LIMIT = 5 * 60 * 1000;
+const INACTIVITY_LIMIT = 15 * 60 * 1000;
 
 const useAutoLogout = () => {
   const { signOut } = useAuth();
