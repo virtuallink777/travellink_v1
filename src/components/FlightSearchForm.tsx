@@ -5,6 +5,7 @@ import { buttonVariants } from "./ui/button";
 import FlightOffer from "./FlightOffer";
 import { convertToIATACode } from "@/lib/utils";
 import { cityColMap } from "@/lib/utils";
+import ButtonSpecial from "./ButtonSpecial";
 
 export default function FlightSearchForm() {
   const [flights, setFlights] = useState([]);
@@ -121,7 +122,7 @@ export default function FlightSearchForm() {
 
       console.log("Respuesta procesada:", data);
       setFlights(data);
-    } catch (error) {
+    } catch (error: any) {
       setError(error.message);
       console.error("Error al buscar vuelos:", error);
     } finally {
@@ -130,108 +131,122 @@ export default function FlightSearchForm() {
   };
 
   return (
-    <div className="flex flex-col mt-4">
-      <div className="mb-4 relative" ref={originRef}>
-        <input
-          type="text"
-          placeholder="Ciudad de Origen"
-          value={origin}
-          onChange={(e) => setOrigin(e.target.value)}
-          className="w-full p-2 border rounded"
-        />
-        {originSuggestions.length > 0 && (
-          <ul className="absolute z-10 w-full bg-white border border-gray-300 mt-1 rounded shadow-lg">
-            {originSuggestions.map((city) => (
-              <li
-                key={city}
-                className="p-2 cursor-pointer hover:bg-gray-100"
-                onClick={() => selectCity(city, "origin")}
-              >
-                {city}
-              </li>
-            ))}
-          </ul>
-        )}
+    <>
+      <div>
+        <ButtonSpecial />
       </div>
 
-      <div className="mb-4 relative" ref={destinationRef}>
-        <input
-          type="text"
-          placeholder="Ciudad de Destino"
-          value={destination}
-          onChange={(e) => setDestination(e.target.value)}
-          className="w-full p-2 border rounded"
-        />
-        {destinationSuggestions.length > 0 && (
-          <ul className="absolute z-10 w-full bg-white border border-gray-300 mt-1 rounded shadow-lg">
-            {destinationSuggestions.map((city) => (
-              <li
-                key={city}
-                className="p-2 cursor-pointer hover:bg-gray-100"
-                onClick={() => selectCity(city, "destination")}
-              >
-                {city}
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-
-      <div className="mb-4 mr-4">
-        <div className="mr-4">Cantidad de Adultos:</div>
-        <input
-          type="number"
-          placeholder="Adultos"
-          value={adults}
-          onChange={(e) => setAdults(Number(e.target.value))}
-          min={1}
-          className="w-full p-2 border rounded"
-        />
-      </div>
-      <div className="mb-4 mr-4">
-        <div className="mr-4">Cantidad de Niños:</div>
-        <input
-          type="number"
-          placeholder="Niños"
-          value={kids}
-          onChange={(e) => setKids(Number(e.target.value))}
-          min={0}
-          className="w-full p-2 border rounded"
-        />
-      </div>
-
-      <div className="mb-4">
-        <input
-          type="date"
-          value={departureDate}
-          onChange={(e) => setDepartureDate(e.target.value)}
-          className="w-full p-2 border rounded"
-        />
-      </div>
-
-      <Button
-        onClick={searchFlights}
-        className={cn(
-          buttonVariants(),
-          "hover:bg-blue-700 hover:text-yellow-300"
-        )}
-        disabled={isLoading}
-      >
-        {isLoading ? "Buscando..." : "Buscar Vuelos"}
-      </Button>
-
-      {error && <p className="text-red-500 mt-2">{error}</p>}
-
-      {flights.length > 0 ? (
-        <div className="mt-4">
-          <h2 className="text-2xl font-bold mb-4">Resultados de la búsqueda</h2>
-          {flights.map((flight: any, index: number) => (
-            <FlightOffer key={index} offer={flight} />
-          ))}
+      <div className="flex flex-col mt-4">
+        <div className="flex items-center mb-4 relative" ref={originRef}>
+          <label className="mr-4 w-1/3">Ciudad de Origen:</label>
+          <input
+            type="text"
+            placeholder="Ciudad de Origen"
+            value={origin}
+            onChange={(e) => setOrigin(e.target.value)}
+            className="w-2/3 p-2 border rounded"
+          />
+          {originSuggestions.length > 0 && (
+            <ul className="absolute z-10 w-full bg-white border border-gray-300 mt-1 rounded shadow-lg">
+              {originSuggestions.map((city) => (
+                <li
+                  key={city}
+                  className="p-2 cursor-pointer hover:bg-gray-100"
+                  onClick={() => selectCity(city, "origin")}
+                >
+                  {city}
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
-      ) : (
-        <p className="mt-4">No se encontraron vuelos</p>
-      )}
-    </div>
+
+        <div className="flex items-center mb-4 relative" ref={destinationRef}>
+          <label className="mr-4 w-1/3">Ciudad de Destino:</label>
+          <input
+            type="text"
+            placeholder="Ciudad de Destino"
+            value={destination}
+            onChange={(e) => setDestination(e.target.value)}
+            className="w-2/3 p-2 border rounded"
+          />
+          {destinationSuggestions.length > 0 && (
+            <ul className="absolute z-10 w-full bg-white border border-gray-300 mt-1 rounded shadow-lg">
+              {destinationSuggestions.map((city) => (
+                <li
+                  key={city}
+                  className="p-2 cursor-pointer hover:bg-gray-100"
+                  onClick={() => selectCity(city, "destination")}
+                >
+                  {city}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        <div className="flex items-center mb-4">
+          <label className="mr-4 w-1/3">Cantidad de Adultos:</label>
+          <input
+            type="number"
+            placeholder="Adultos"
+            value={adults}
+            onChange={(e) => setAdults(Number(e.target.value))}
+            min={1}
+            className="w-2/3 p-2 border rounded"
+          />
+        </div>
+
+        <div className="flex items-center mb-4">
+          <label className="mr-4 w-1/3">Cantidad de Niños:</label>
+          <input
+            type="number"
+            placeholder="Niños"
+            value={kids}
+            onChange={(e) => setKids(Number(e.target.value))}
+            min={0}
+            className="w-2/3 p-2 border rounded"
+          />
+        </div>
+
+        <div className="flex items-center mb-4">
+          <label className="mr-4 w-1/3">Fecha de Salida:</label>
+          <input
+            type="date"
+            value={departureDate}
+            onChange={(e) => setDepartureDate(e.target.value)}
+            className="w-2/3 p-2 border rounded"
+          />
+        </div>
+
+        <Button
+          onClick={searchFlights}
+          className={cn(
+            buttonVariants(),
+            "hover:bg-blue-700 hover:text-yellow-300"
+          )}
+          disabled={isLoading}
+        >
+          {isLoading ? "Buscando..." : "Buscar Vuelos"}
+        </Button>
+
+        {error && <p className="text-red-500 mt-2">{error}</p>}
+
+        {flights.length > 0 ? (
+          <div className="mt-4 w-full">
+            <h2 className="text-2xl font-bold mb-4">
+              Resultados de la búsqueda
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {flights.map((flight, index) => (
+                <FlightOffer key={index} offer={flight} />
+              ))}
+            </div>
+          </div>
+        ) : (
+          <p className="mt-4">No se encontraron vuelos</p>
+        )}
+      </div>
+    </>
   );
 }

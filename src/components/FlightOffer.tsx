@@ -5,7 +5,6 @@ interface FlightOfferProps {
 }
 
 const FlightOffer: React.FC<FlightOfferProps> = ({ offer }) => {
-  // Verificamos si los datos necesarios existen antes de acceder a ellos
   if (
     !offer.itineraries ||
     !offer.itineraries[0] ||
@@ -20,7 +19,7 @@ const FlightOffer: React.FC<FlightOfferProps> = ({ offer }) => {
       .arrival;
 
   return (
-    <div className="border rounded-lg p-4 mb-4 shadow-md">
+    <div className="border rounded-lg p-4 shadow-md h-full">
       <div className="flex justify-between items-center mb-2">
         <h3 className="text-lg font-semibold">
           {departure.iataCode} → {arrival.iataCode}
