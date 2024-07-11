@@ -1,11 +1,15 @@
 import React, { useState } from "react";
 import "../specialcss/buttoncss.css";
 
-const ButtonSpecial: React.FC = () => {
-  const [selectedType, setSelectedType] = useState<"go" | "goAndBack" | null>(
-    null
-  );
+interface ButtonSpecialProps {
+  selectedType: "go" | "goAndBack" | null;
+  setSelectedType: (type: "go" | "goAndBack" | null) => void;
+}
 
+const ButtonSpecial: React.FC<ButtonSpecialProps> = ({
+  selectedType,
+  setSelectedType,
+}) => {
   const handleGoClick = () => {
     setSelectedType(selectedType === "go" ? null : "go");
   };

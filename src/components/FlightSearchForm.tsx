@@ -13,6 +13,7 @@ export default function FlightSearchForm() {
   const [origin, setOrigin] = useState("");
   const [destination, setDestination] = useState("");
   const [departureDate, setDepartureDate] = useState("");
+  const [returnDate, setReturnDate] = useState("");
   const [adults, setAdults] = useState(1);
   const [kids, setKids] = useState(0);
   const [originSuggestions, setOriginSuggestions] = useState<string[]>([]);
@@ -20,8 +21,12 @@ export default function FlightSearchForm() {
     string[]
   >([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedType, setSelectedType] = useState<"go" | "goAndBack" | null>(
+    null
+  );
   const originRef = useRef<HTMLDivElement>(null);
   const destinationRef = useRef<HTMLDivElement>(null);
+  const [hasSearched, setHasSearched] = useState(false);
 
   useEffect(() => {
     if (origin) {
@@ -83,6 +88,7 @@ export default function FlightSearchForm() {
     try {
       setError(null);
       setIsLoading(true);
+      setHasSearched(true);
       console.log("Iniciando búsqueda de vuelos...");
 
       if (!origin || !destination || !departureDate || !adults) {
@@ -100,6 +106,7 @@ export default function FlightSearchForm() {
         originLocationCode: originCode,
         destinationLocationCode: destinationCode,
         departureDate: departureDate,
+        returnDate: returnDate,
         adults: adults.toString(),
         kids: kids.toString(),
       });
@@ -133,7 +140,10 @@ export default function FlightSearchForm() {
   return (
     <>
       <div>
-        <ButtonSpecial />
+        <ButtonSpecial
+          selectedType={selectedType}
+          setSelectedType={setSelectedType}
+        />
       </div>
 
       <div className="flex flex-col mt-4">
@@ -218,6 +228,16 @@ export default function FlightSearchForm() {
             className="w-2/3 p-2 border rounded"
           />
         </div>
+        <div className="flex items-center mb-4">
+          <label className="mr-4 w-1/3">Fecha de llegada:</label>
+          <input
+            type="date"
+            value={returnDate}
+            onChange={(e) => setReturnDate(e.target.value)}
+            className="w-2/3 p-2 border rounded"
+            disabled={selectedType === "go"}
+          />
+        </div>
 
         <Button
           onClick={searchFlights}
@@ -232,7 +252,7 @@ export default function FlightSearchForm() {
 
         {error && <p className="text-red-500 mt-2">{error}</p>}
 
-        {flights.length > 0 ? (
+        {hasSearched && flights.length > 0 ? (
           <div className="mt-4 w-full">
             <h2 className="text-2xl font-bold mb-4">
               Resultados de la búsqueda
@@ -243,9 +263,9 @@ export default function FlightSearchForm() {
               ))}
             </div>
           </div>
-        ) : (
-          <p className="mt-4">No se encontraron vuelos</p>
-        )}
+        ) : hasSearched && flights.length === 0 ? (
+          <p className="mt-4">No se han encontraron vuelos aun</p>
+        ) : null}
       </div>
     </>
   );

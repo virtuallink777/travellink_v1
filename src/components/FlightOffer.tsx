@@ -1,10 +1,26 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
+import formatDuration from "@/lib/parseDuration";
+import { convertEURtoCOP, getExchangeRate } from "@/lib/getExchangeRate";
+import { formatCurrency } from "@/lib/formatCurrency";
+
+//estado para almacenar el precio convertido de EUR a COP
 
 interface FlightOfferProps {
   offer: any;
 }
 
 const FlightOffer: React.FC<FlightOfferProps> = ({ offer }) => {
+  const [copPrice, setCopPrice] = useState("");
+
+  useEffect(() => {
+    async function convertPrice() {
+      const rate = await getExchangeRate();
+      const convertedPrice = convertEURtoCOP(offer.price.total, rate);
+      setCopPrice(convertedPrice);
+    }
+    convertPrice();
+  }, [offer.price.total]);
+
   if (
     !offer.itineraries ||
     !offer.itineraries[0] ||
@@ -25,13 +41,15 @@ const FlightOffer: React.FC<FlightOfferProps> = ({ offer }) => {
           {departure.iataCode} → {arrival.iataCode}
         </h3>
         <span className="text-xl font-bold">
-          {offer.price.total} {offer.price.currency}
+          {copPrice
+            ? `${formatCurrency(copPrice)} COP`
+            : `${formatCurrency(offer.price.total)} ${offer.price.currency}`}
         </span>
       </div>
       <div className="text-sm text-gray-600">
         <p>Salida: {new Date(departure.at).toLocaleString()}</p>
         <p>Llegada: {new Date(arrival.at).toLocaleString()}</p>
-        <p>Duración: {offer.itineraries[0].duration}</p>
+        <p>Duración: {formatDuration(offer.itineraries[0].duration)}</p>
         <p>Aerolínea: {offer.validatingAirlineCodes.join(", ")}</p>
       </div>
       <div className="mt-2">
