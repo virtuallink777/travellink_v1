@@ -1,7 +1,5 @@
 import type { NextApiRequest, NextApiResponse } from "next";
 import Amadeus from "amadeus";
-import { Currency } from "lucide-react";
-import { string } from "zod";
 
 const amadeus = new Amadeus({
   clientId: process.env.AMADEUS_API_KEY as string,
@@ -31,6 +29,7 @@ export default async function handler(
         destinationLocationCode,
         departureDate,
         adults: adults.toString(),
+
         max: "10", // Se pueden agregar mas solicitudes
       });
 
