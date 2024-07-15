@@ -15,7 +15,8 @@ export default function FlightSearchForm() {
   const [departureDate, setDepartureDate] = useState("");
   const [returnDate, setReturnDate] = useState("");
   const [adults, setAdults] = useState(1);
-  const [kids, setKids] = useState(0);
+  const [children, setChildren] = useState(0);
+  const [infants, setInfants] = useState(0);
   const [originSuggestions, setOriginSuggestions] = useState<string[]>([]);
   const [destinationSuggestions, setDestinationSuggestions] = useState<
     string[]
@@ -106,10 +107,17 @@ export default function FlightSearchForm() {
         originLocationCode: originCode,
         destinationLocationCode: destinationCode,
         departureDate: departureDate,
-        returnDate: returnDate,
+
         adults: adults.toString(),
-        kids: kids.toString(),
+        children: children.toString(),
+        infants: infants.toString(),
       });
+
+      // incluir returnDate si el viaje es de ida y vuelta
+
+      if (selectedType === "goAndBack" && returnDate) {
+        params.append("returnDate", returnDate);
+      }
 
       const response = await fetch("/api/searchFlights", {
         method: "POST",
@@ -212,8 +220,21 @@ export default function FlightSearchForm() {
           <input
             type="number"
             placeholder="Niños"
-            value={kids}
-            onChange={(e) => setKids(Number(e.target.value))}
+            value={children}
+            onChange={(e) => setChildren(Number(e.target.value))}
+            min={0}
+            className="w-2/3 p-2 border rounded"
+          />
+        </div>
+        <div className="flex items-center mb-4">
+          <label className="mr-4 w-1/3">
+            Cantidad de Niños Menores de 2 años:
+          </label>
+          <input
+            type="number"
+            placeholder="Infantes"
+            value={infants}
+            onChange={(e) => setInfants(Number(e.target.value))}
             min={0}
             className="w-2/3 p-2 border rounded"
           />
@@ -228,16 +249,19 @@ export default function FlightSearchForm() {
             className="w-2/3 p-2 border rounded"
           />
         </div>
-        <div className="flex items-center mb-4">
-          <label className="mr-4 w-1/3">Fecha de llegada:</label>
-          <input
-            type="date"
-            value={returnDate}
-            onChange={(e) => setReturnDate(e.target.value)}
-            className="w-2/3 p-2 border rounded"
-            disabled={selectedType === "go"}
-          />
-        </div>
+
+        {selectedType !== "go" ? (
+          <div className="flex items-center mb-4">
+            <label className="mr-4 w-1/3">Fecha de llegada:</label>
+
+            <input
+              type="date"
+              value={returnDate}
+              onChange={(e) => setReturnDate(e.target.value)}
+              className="w-2/3 p-2 border rounded"
+            />
+          </div>
+        ) : null}
 
         <Button
           onClick={searchFlights}

@@ -19,19 +19,33 @@ export default async function handler(
         originLocationCode,
         destinationLocationCode,
         departureDate,
+        returnDate,
         adults,
+        children,
+        infants,
       } = req.body;
 
       console.log("Realizando solicitud a Amadeus API...");
 
-      const response = await amadeus.shopping.flightOffersSearch.get({
+      // se crear el objeto de parámetros de búsqueda
+      const searchParams: any = {
         originLocationCode,
         destinationLocationCode,
         departureDate,
         adults: adults.toString(),
+        children: children.toString(),
+        infants: infants.toString(),
+        max: "10", // Se pueden agregar más solicitudes
+      };
 
-        max: "10", // Se pueden agregar mas solicitudes
-      });
+      // Solo incluir returnDate si está presente y no está vacío
+      if (returnDate && returnDate.trim() !== "") {
+        searchParams.returnDate = returnDate;
+      }
+
+      const response = await amadeus.shopping.flightOffersSearch.get(
+        searchParams
+      );
 
       console.log("Respuesta recibida de Amadeus API");
 
