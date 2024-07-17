@@ -23,6 +23,7 @@ export default async function handler(
         adults,
         children,
         infants,
+        travelClass,
       } = req.body;
 
       console.log("Realizando solicitud a Amadeus API...");
@@ -36,6 +37,7 @@ export default async function handler(
         children: children.toString(),
         infants: infants.toString(),
         max: "10", // Se pueden agregar más solicitudes
+        travelClass: travelClass,
       };
 
       // Solo incluir returnDate si está presente y no está vacío

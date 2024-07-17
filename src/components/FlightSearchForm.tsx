@@ -21,6 +21,7 @@ export default function FlightSearchForm() {
   const [destinationSuggestions, setDestinationSuggestions] = useState<
     string[]
   >([]);
+  const [travelClass, setTravelClass] = useState("ECONOMY");
   const [isLoading, setIsLoading] = useState(false);
   const [selectedType, setSelectedType] = useState<"go" | "goAndBack" | null>(
     null
@@ -100,6 +101,25 @@ export default function FlightSearchForm() {
         throw new Error("El origen y el destino no pueden ser iguales");
       }
 
+      if (selectedType === "goAndBack") {
+        if (!returnDate) {
+          throw new Error("Por favor, complete la fecha de regreso");
+        }
+        const departureDateObj = new Date(departureDate);
+        const returnDateObj = new Date(returnDate);
+        if (departureDateObj > returnDateObj) {
+          throw new Error(
+            "La fecha de regreso debe ser posterior a la fecha de ida"
+          );
+        }
+      }
+
+      if (selectedType !== "goAndBack" && selectedType !== "go") {
+        throw new Error(
+          "Debe seleccionar el tipo de viaje (ida o ida y vuelta)"
+        );
+      }
+
       const originCode = convertToIATACode(origin);
       const destinationCode = convertToIATACode(destination);
 
@@ -107,10 +127,10 @@ export default function FlightSearchForm() {
         originLocationCode: originCode,
         destinationLocationCode: destinationCode,
         departureDate: departureDate,
-
         adults: adults.toString(),
         children: children.toString(),
         infants: infants.toString(),
+        travelClass: travelClass,
       });
 
       // incluir returnDate si el viaje es de ida y vuelta
@@ -147,132 +167,152 @@ export default function FlightSearchForm() {
 
   return (
     <>
-      <div>
-        <ButtonSpecial
-          selectedType={selectedType}
-          setSelectedType={setSelectedType}
-        />
-      </div>
+      <div className="flex flex-col items-center max-w-2xl mx-auto">
+        <div className="w-full mb-6 flex justify-center space-x-4">
+          <div>
+            <ButtonSpecial
+              selectedType={selectedType}
+              setSelectedType={setSelectedType}
+            />
+          </div>
 
-      <div className="flex flex-col mt-4">
-        <div className="flex items-center mb-4 relative" ref={originRef}>
-          <label className="mr-4 w-1/3">Ciudad de Origen:</label>
-          <input
-            type="text"
-            placeholder="Ciudad de Origen"
-            value={origin}
-            onChange={(e) => setOrigin(e.target.value)}
-            className="w-2/3 p-2 border rounded"
-          />
-          {originSuggestions.length > 0 && (
-            <ul className="absolute z-10 w-full bg-white border border-gray-300 mt-1 rounded shadow-lg">
-              {originSuggestions.map((city) => (
-                <li
-                  key={city}
-                  className="p-2 cursor-pointer hover:bg-gray-100"
-                  onClick={() => selectCity(city, "origin")}
-                >
-                  {city}
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-
-        <div className="flex items-center mb-4 relative" ref={destinationRef}>
-          <label className="mr-4 w-1/3">Ciudad de Destino:</label>
-          <input
-            type="text"
-            placeholder="Ciudad de Destino"
-            value={destination}
-            onChange={(e) => setDestination(e.target.value)}
-            className="w-2/3 p-2 border rounded"
-          />
-          {destinationSuggestions.length > 0 && (
-            <ul className="absolute z-10 w-full bg-white border border-gray-300 mt-1 rounded shadow-lg">
-              {destinationSuggestions.map((city) => (
-                <li
-                  key={city}
-                  className="p-2 cursor-pointer hover:bg-gray-100"
-                  onClick={() => selectCity(city, "destination")}
-                >
-                  {city}
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-
-        <div className="flex items-center mb-4">
-          <label className="mr-4 w-1/3">Cantidad de Adultos:</label>
-          <input
-            type="number"
-            placeholder="Adultos"
-            value={adults}
-            onChange={(e) => setAdults(Number(e.target.value))}
-            min={1}
-            className="w-2/3 p-2 border rounded"
-          />
-        </div>
-
-        <div className="flex items-center mb-4">
-          <label className="mr-4 w-1/3">Cantidad de Niños:</label>
-          <input
-            type="number"
-            placeholder="Niños"
-            value={children}
-            onChange={(e) => setChildren(Number(e.target.value))}
-            min={0}
-            className="w-2/3 p-2 border rounded"
-          />
-        </div>
-        <div className="flex items-center mb-4">
-          <label className="mr-4 w-1/3">
-            Cantidad de Niños Menores de 2 años:
-          </label>
-          <input
-            type="number"
-            placeholder="Infantes"
-            value={infants}
-            onChange={(e) => setInfants(Number(e.target.value))}
-            min={0}
-            className="w-2/3 p-2 border rounded"
-          />
-        </div>
-
-        <div className="flex items-center mb-4">
-          <label className="mr-4 w-1/3">Fecha de Salida:</label>
-          <input
-            type="date"
-            value={departureDate}
-            onChange={(e) => setDepartureDate(e.target.value)}
-            className="w-2/3 p-2 border rounded"
-          />
-        </div>
-
-        {selectedType !== "go" ? (
           <div className="flex items-center mb-4">
-            <label className="mr-4 w-1/3">Fecha de llegada:</label>
+            <label className="mr-4 w-1/3">Clase:</label>
+            <select
+              value={travelClass}
+              onChange={(e) => setTravelClass(e.target.value)}
+              className="w-2/3 p-2 border rounded"
+            >
+              <option value="ECONOMY">ECONOMICA</option>
+              <option value="PREMIUM_ECONOMY">PREMIUM ECONOMICA</option>
+              <option value="BUSINESS">BUSINESS</option>
+              <option value="FIRST">PRIMERA CLASE</option>
+            </select>
+          </div>
+        </div>
 
+        <div className="flex flex-col w-full mb-6">
+          <div className="flex items-center mb-4 relative" ref={originRef}>
+            <label className="mr-4 w-1/3">Ciudad de Origen:</label>
             <input
-              type="date"
-              value={returnDate}
-              onChange={(e) => setReturnDate(e.target.value)}
+              type="text"
+              placeholder="Ciudad de Origen"
+              value={origin}
+              onChange={(e) => setOrigin(e.target.value)}
+              className="w-2/3 p-2 border rounded"
+            />
+            {originSuggestions.length > 0 && (
+              <ul className="absolute z-10 w-full bg-white border border-gray-300 mt-1 rounded shadow-lg">
+                {originSuggestions.map((city) => (
+                  <li
+                    key={city}
+                    className="p-2 cursor-pointer hover:bg-gray-100"
+                    onClick={() => selectCity(city, "origin")}
+                  >
+                    {city}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          <div className="flex items-center mb-4 relative" ref={destinationRef}>
+            <label className="mr-4 w-1/3">Ciudad de Destino:</label>
+            <input
+              type="text"
+              placeholder="Ciudad de Destino"
+              value={destination}
+              onChange={(e) => setDestination(e.target.value)}
+              className="w-2/3 p-2 border rounded"
+            />
+            {destinationSuggestions.length > 0 && (
+              <ul className="absolute z-10 w-full bg-white border border-gray-300 mt-1 rounded shadow-lg">
+                {destinationSuggestions.map((city) => (
+                  <li
+                    key={city}
+                    className="p-2 cursor-pointer hover:bg-gray-100"
+                    onClick={() => selectCity(city, "destination")}
+                  >
+                    {city}
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
+
+          <div className="flex items-center mb-4">
+            <label className="mr-4 w-1/3">Cantidad de Adultos:</label>
+            <input
+              type="number"
+              placeholder="Adultos"
+              value={adults}
+              onChange={(e) => setAdults(Number(e.target.value))}
+              min={1}
               className="w-2/3 p-2 border rounded"
             />
           </div>
-        ) : null}
 
-        <Button
-          onClick={searchFlights}
-          className={cn(
-            buttonVariants(),
-            "hover:bg-blue-700 hover:text-yellow-300"
-          )}
-          disabled={isLoading}
-        >
-          {isLoading ? "Buscando..." : "Buscar Vuelos"}
-        </Button>
+          <div className="flex items-center mb-4">
+            <label className="mr-4 w-1/3">Cantidad de Niños:</label>
+            <input
+              type="number"
+              placeholder="Niños"
+              value={children}
+              onChange={(e) => setChildren(Number(e.target.value))}
+              min={0}
+              className="w-2/3 p-2 border rounded"
+            />
+          </div>
+          <div className="flex items-center mb-4">
+            <label className="mr-4 w-1/3">
+              Cantidad de Niños Menores de 2 años:
+            </label>
+            <input
+              type="number"
+              placeholder="Infantes"
+              value={infants}
+              onChange={(e) => setInfants(Number(e.target.value))}
+              min={0}
+              className="w-2/3 p-2 border rounded"
+            />
+          </div>
+
+          <div className="flex items-center mb-4">
+            <label className="mr-4 w-1/3">Fecha de Salida:</label>
+            <input
+              type="date"
+              value={departureDate}
+              onChange={(e) => setDepartureDate(e.target.value)}
+              className="w-2/3 p-2 border rounded"
+            />
+          </div>
+
+          {selectedType !== "go" ? (
+            <div className="flex items-center mb-4">
+              <label className="mr-4 w-1/3">Fecha de llegada:</label>
+
+              <input
+                type="date"
+                value={returnDate}
+                onChange={(e) => setReturnDate(e.target.value)}
+                className="w-2/3 p-2 border rounded"
+              />
+            </div>
+          ) : null}
+        </div>
+
+        <div className="mt-1">
+          <Button
+            onClick={searchFlights}
+            className={cn(
+              buttonVariants(),
+              "hover:bg-blue-700 hover:text-yellow-300"
+            )}
+            disabled={isLoading}
+          >
+            {isLoading ? "Buscando..." : "Buscar Vuelos"}
+          </Button>
+        </div>
 
         {error && <p className="text-red-500 mt-2">{error}</p>}
 
